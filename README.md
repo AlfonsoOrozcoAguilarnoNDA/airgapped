@@ -1,3 +1,11 @@
+# ¿Qué es este documento?
+
+Esta es la guía "maestra" de las librerías de terceros que deben estar instaladas en los servidores PHP que administro (principalmente PHP 8.x, y en algunos casos 7.x). Estos sistemas manejan información sensible y operan en entornos desconectados de Internet (**air-gapped**), por lo que todas las librerías se sirven localmente.
+
+Las versiones aquí listadas **no son las más recientes**, sino las que a **mayo de 2025** están autorizadas para su uso. Existen incompatibilidades menores con Bootstrap 5 en los componentes y librerías actuales, por lo que lo más sensato es mantener Bootstrap 4.6.2 y, mientras tanto, documentar lo necesario para actualizar lo que sí puede hacerse hoy. La migración a Bootstrap 5 queda pendiente hasta que se defina un esquema de pago por ese trabajo.
+
+Este es el stack utilizado en proyectos gubernamentales entre 2020 y 2025. Algunos sistemas heredados ni siquiera usan Bootstrap y se migrarán, junto con el resto, cuando se defina el esquema de pago correspondiente. Esta es una documentación interna de los pasos a seguir, pero el uso de boostrap 4.6.2 es necesario por ser lo documentado en varios documentos de especificaciones hechos en su momento.
+
 # Guía de Instalación para Entorno Air-Gapped
 
 Esta guía contiene todos los recursos necesarios para ejecutar el sistema en un entorno desconectado de internet (air-gapped).
