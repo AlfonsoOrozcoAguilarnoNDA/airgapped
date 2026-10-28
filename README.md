@@ -13,9 +13,11 @@ Antes de comenzar, asegúrate de tener:
 
 **IMPORTANTE:** Tanto Bootstrap 4 como DataTables requieren jQuery para funcionar.
 
-- **jQuery 3.6.0** (Compatible con Bootstrap 4.6.2)
-  - Descargar: [jquery-3.6.0.min.js](https://code.jquery.com/jquery-3.6.0.min.js)
+- **jQuery 3.7.1** (última versión de la rama 3.x, compatible con Bootstrap 4.6.2 y DataTables 1.13.x)
+  - Descargar: [jquery-3.7.1.min.js](https://code.jquery.com/jquery-3.7.1.min.js)
   - *Instrucciones: Clic derecho → Guardar enlace como...*
+
+**Justificación de la versión:** jQuery 3.7.1 es la última versión publicada de la rama 3.x. Incluye las correcciones de seguridad de 3.5.0 (XSS en `htmlPrefilter`) y las correcciones de errores posteriores, sin requerir cambios de código respecto a 3.6.0.
 
 ---
 
@@ -52,6 +54,8 @@ Si prefieres descargar manualmente los archivos base:
 2. [jquery.dataTables.min.js](https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js)
 3. [dataTables.bootstrap4.min.js](https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js)
 
+> Se usa la rama 1.x de DataTables porque es la que tiene integración con Bootstrap 4 y jQuery. Se recomienda usar el último parche disponible de la 1.13.x.
+
 ### 4. Traducción de DataTables al Español
 
 - **Archivo:** `es-ES.json`
@@ -63,3 +67,69 @@ Si prefieres descargar manualmente los archivos base:
 ## 📂 Estructura de Carpetas Recomendada
 
 Organiza los archivos descargados en la siguiente estructura dentro de tu proyecto PHP:
+
+```
+proyecto/
+└── assets/
+    └── vendor/
+        ├── jquery/
+        │   └── jquery-3.7.1.min.js
+        ├── bootstrap/
+        │   ├── css/bootstrap.min.css
+        │   └── js/bootstrap.bundle.min.js
+        ├── fontawesome/
+        │   ├── css/all.min.css
+        │   └── webfonts/
+        └── datatables/
+            ├── css/dataTables.bootstrap4.min.css
+            ├── js/jquery.dataTables.min.js
+            ├── js/dataTables.bootstrap4.min.js
+            └── i18n/es.json
+```
+
+---
+
+## 🔐 Verificación de Integridad
+
+Después de descargar en la máquina con internet, genera los hashes y transfiérelos junto con los archivos. En el servidor air-gapped, verifica que coincidan:
+
+```bash
+# En la máquina con internet
+cd assets/vendor && find . -type f -exec sha256sum {} \; > SHA256SUMS.txt
+
+# En el servidor air-gapped
+cd assets/vendor && sha256sum -c SHA256SUMS.txt
+```
+
+---
+
+## 📑 Licencias
+
+| Librería | Versión | Licencia |
+|---|---|---|
+| Bootstrap | 4.6.2 | MIT |
+| jQuery | 3.7.1 | MIT |
+| DataTables | 1.13.x | MIT |
+| Font Awesome Free | 5.15.4 | Iconos: CC BY 4.0 · Fuentes: SIL OFL 1.1 · Código: MIT |
+
+Conserva los comentarios de cabecera de copyright en los archivos CSS/JS (no los elimines al minificar).
+
+---
+
+## ⚖️ Riesgo Aceptado y Controles Compensatorios
+
+**Decisión:** Se mantiene **Bootstrap 4.6.2** por compatibilidad con los componentes y librerías existentes del sistema. La migración a Bootstrap 5 implica una reescritura que está fuera del alcance y del presupuesto del proyecto.
+
+**Riesgo identificado:** Bootstrap 4 llegó al fin de su vida útil (enero de 2023) y ya no recibe parches. Existen vulnerabilidades XSS conocidas en componentes específicos (tooltip, popover, carousel) que no serán corregidas en esta rama.
+
+**Controles compensatorios:**
+1. **Entorno aislado (air-gapped):** elimina la explotación remota y los ataques de cadena de suministro en tiempo de ejecución (sin CDN).
+2. **Recursos servidos localmente** con versiones fijadas y verificadas mediante hashes SHA-256.
+3. **Dependencias actualizadas dentro de su rama:** jQuery 3.7.1 y DataTables en la última versión 1.13.x.
+4. **Escape de salida en el servidor** (`htmlspecialchars` con `ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'`) en todo dato que se imprima, lo que neutraliza los XSS independientemente de la versión de la librería.
+5. **Content-Security-Policy estricta** (por ejemplo `script-src 'self'`; sin `unsafe-inline` donde sea posible).
+6. **Restricción de uso:** los componentes tooltip, popover y carousel no deben recibir HTML proporcionado por usuarios. La opción `sanitize` de Bootstrap se mantiene activa.
+
+**Plan de migración diferido:** la actualización a Bootstrap 5 se evaluará cuando exista presupuesto o cuando se reescriban los módulos afectados, pantalla por pantalla.
+
+**Estado:** riesgo aceptado y documentado.
