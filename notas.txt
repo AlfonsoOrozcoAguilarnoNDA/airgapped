@@ -1,0 +1,28 @@
+Dejé vendor.php y un app-init.js opcional.
+
+Uso en cada página
+
+php
+<?php
+require_once __DIR__ . '/vendor.php';
+headervendor('Mi página');
+?>
+<div class="container">
+  <table class="table datatable"> ... </table>
+</div>
+<?php footvendor(); ?>
+
+Qué hace cada función
+
+headervendor($titulo, $opts) manda las cabeceras de seguridad (incluida la CSP), abre <html> y <head>, carga los CSS en orden y abre <body>. Con $opts puedes pasar css_extra, body_class, lang o csp => false.
+footvendor($js_extra) carga jQuery, Bootstrap bundle y DataTables en el orden correcto, luego tus scripts extra, luego app-init.js, y cierra </body></html>.
+
+Cosas que debes revisar
+
+Rutas. Supuse la estructura que te propuse (/assets/vendor/...) y que el Download Builder te dio los bundles datatables.min.css y datatables.min.js. Si tus archivos están en otro lado, cambia solo VENDOR_URL y las dos funciones _vendor_css() y _vendor_js() al inicio del archivo. Si falta alguno, el HTML trae un comentario vendor.php: NO ENCONTRADO ... para que lo detectes rápido.
+jQuery separado. El bundle del builder normalmente no incluye jQuery, por eso lo cargo aparte antes de todo. Si marcaste esa opción en el builder, quita la línea de jQuery para no cargarlo dos veces.
+CSP y scripts inline. La cabecera script-src 'self' bloquea cualquier <script> escrito dentro de la página. Todo el JS debe ir en archivos externos (por eso el app-init.js, o pásalos con footvendor(['/js/mi-pagina.js'])). Es incómodo al principio, pero es justo lo que hace efectivo ese control compensatorio. Los estilos sí permiten 'unsafe-inline' porque Bootstrap 4 y DataTables lo necesitan.
+app-init.js. Convierte automáticamente cualquier <table class="datatable"> en DataTable en español (ruta /assets/vendor/datatables/i18n/es.json) y activa los tooltips. Si no lo quieres, no lo copies y simplemente no se carga.
+Caché. Cada archivo lleva ?v=<fecha de modificación>, así que al reemplazar una librería el navegador la recarga solo.
+
+Si tu CSP choca con alguna pantalla que ya tengas (por ejemplo, un onclick="" inline), esa es la primera causa a revisar en la consola del navegador.
